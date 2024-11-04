@@ -1,0 +1,114 @@
+import React, { useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
+const CreateRoom = () => {
+  const [name, setName] = useState('');
+  const [rolesAvailable, setRolesAvailable] = useState([]);
+  const [videoConferenceUrl, setVideoConferenceUrl] = useState('');
+  const navigate = useNavigate();
+
+  const handleCreateRoom = async (e) => {
+    e.preventDefault();
+
+    const token = localStorage.getItem('token');
+    if (!token) {
+      alert('You need to login first.');
+      return;
+    }
+
+    try {
+      await axios.post(
+        '/api/rooms/create',
+        { name, rolesAvailable, videoConferenceUrl },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      navigate('/rooms');
+    } catch (err) {
+      console.error('Error creating room', err);
+      alert('There was an error creating the room, please try again.');
+    }
+  };
+
+  const handleRolesChange = (role) => {
+    if (rolesAvailable.includes(role)) {
+      setRolesAvailable(rolesAvailable.filter((r) => r !== role));
+    } else {
+      setRolesAvailable([...rolesAvailable, role]);
+    }
+  };
+
+  return (
+    <form onSubmit={handleCreateRoom}>
+      <h2>Create a New Room</h2>
+      <input
+        type="text"
+        placeholder="Room Name"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        required
+      />
+      <div>
+        <h4>Select Available Roles:</h4>
+        <label>
+          <input
+            type="checkbox"
+            value="bass"
+            checked={rolesAvailable.includes('bass')}
+            onChange={() => handleRolesChange('bass')}
+          />
+          Bass
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="vocal"
+            checked={rolesAvailable.includes('vocal')}
+            onChange={() => handleRolesChange('vocal')}
+          />
+          Vocal
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="drums"
+            checked={rolesAvailable.includes('drums')}
+            onChange={() => handleRolesChange('drums')}
+          />
+          Drums
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="guitar"
+            checked={rolesAvailable.includes('guitar')}
+            onChange={() => handleRolesChange('guitar')}
+          />
+          Guitar
+        </label>
+        <label>
+          <input
+            type="checkbox"
+            value="keyboard"
+            checked={rolesAvailable.includes('keyboard')}
+            onChange={() => handleRolesChange('keyboard')}
+          />
+          Keyboard
+        </label>
+      </div>
+      <input
+        type="text"
+        placeholder="Video Conference URL"
+        value={videoConferenceUrl}
+        onChange={(e) => setVideoConferenceUrl(e.target.value)}
+      />
+      <button type="submit">Create Room</button>
+    </form>
+  );
+};
+
+export default CreateRoom;

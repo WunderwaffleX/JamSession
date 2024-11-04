@@ -1,0 +1,38 @@
+.rooms-container {
+  padding: 20px;
+  max-width: 800px;
+  margin: auto;
+  text-align: center;
+}
+
+.rooms-container h2 {
+  margin-bottom: 20px;
+}
+
+.rooms-container ul {
+  list-style-type: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.rooms-container li {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.create-room-button,
+.profile-button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.create-room-button:hover,
+.profile-button:hover {
+  background-color: #0056b3;
+}
