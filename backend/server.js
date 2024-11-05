@@ -2,13 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-
-// Настройки окружения
+const { swaggerUi, specs } = require('./swagger');
+// Загрузка переменных окружения
 dotenv.config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Подключение Swagger UI
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 
 // Подключение маршрутов
 const userRoutes = require('./routes/users');
@@ -22,8 +25,8 @@ mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 }).then(() => {
-    console.log('MongoDB Connected');
+    console.log('Подключено к базе данных MongoDB');
     app.listen(process.env.PORT || 5000, () => {
-        console.log(`Server running on port ${process.env.PORT || 5000}`);
+        console.log(`Сервер запущен на порту ${process.env.PORT || 5000}`);
     });
-}).catch((err) => console.error(err));
+}).catch((err) => console.error('Ошибка подключения к базе данных:', err));
