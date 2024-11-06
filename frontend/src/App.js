@@ -11,7 +11,7 @@ import './App.css';
 
 function App() {
   return (
-    <div>
+    <div className="app-container">
       <header>Live Jam Session</header>
       <Router>
         <main>
@@ -20,9 +20,9 @@ function App() {
             <Route path="/register" element={<Register />} />
             <Route path="/login" element={<Login />} />
             <Route path="/rooms" element={<Rooms />} />
-	    <Route path="/room" element={<Room />} />
+            <Route path="/room/:roomName" element={<Room />} />
             <Route path="/create-room" element={<CreateRoom />} />
-	    <Route path="/profile" element={<Profile />} />
+              <Route path="/profile" element={<Profile />} />
           </Routes>
         </main>
       </Router>

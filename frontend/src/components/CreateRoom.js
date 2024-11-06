@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import './CreateRoom.css'; // Подключаем стили
+import './CreateRoom.css';
 
 const CreateRoom = () => {
     const [roomName, setRoomName] = useState('');
@@ -16,12 +16,42 @@ const CreateRoom = () => {
         );
     };
 
-    const handleCreateRoom = (e) => {
+    const createRoomOnBackend = async () => {
+        try {
+            const token = localStorage.getItem('token'); // Получите токен из localStorage
+            const response = await fetch('http://localhost:5000/api/rooms/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`, // Добавьте токен в заголовок
+                },
+                body: JSON.stringify({ name: roomName, rolesAvailable: roles }), // Передаем нужные данные
+            });
+            
+            console.log('Response:', response);
+            
+            if (!response.ok) {
+                throw new Error('Failed to create room');
+            }
+    
+            const roomData = await response.json(); // Извлекаем данные комнаты
+            console.log("Room Data:", roomData);
+            
+            return roomData.videoConferenceUrl; // Вернуть URL комнаты
+        } catch (error) {
+            console.error('Error creating room:', error);
+            alert('Failed to create room');
+        }
+    };
+
+    const handleCreateRoom = async (e) => {
         e.preventDefault();
         if (roomName && description && roles.length > 0) {
-            // Логика создания комнаты и перехода
-            console.log('Room created:', { roomName, description, roles });
-            navigate(`/room/${roomName}`); // Переход на страницу комнаты с уникальным URL
+            const roomUrl = await createRoomOnBackend();
+            const nav = '/room/' + roomUrl.split('/').pop();
+            if (roomUrl) {
+                navigate(nav); // Переход к комнате видеоконференции
+            }
         } else {
             alert('Please fill out all fields and select at least one role.');
         }

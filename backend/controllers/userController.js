@@ -16,17 +16,21 @@ exports.register = async (req, res) => {
 
 exports.login = async (req, res) => {
     const { username, password } = req.body;
-
     try {
         const user = await User.findOne({ username });
+        console.log('username:', username);
         if (!user) return res.status(400).json({ message: 'Invalid credentials' });
-
+        
+        console.log('password:', password);
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
 
+        console.log('JWT Secret:', process.env.JWT_SECRET); // For debugging
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
         res.status(200).json({ token });
     } catch (error) {
+        console.log(error);
         res.status(400).json({ message: error.message });
     }
 };

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import './Profile.css';
 
@@ -7,6 +8,7 @@ const Profile = () => {
   const [editMode, setEditMode] = useState(false);
   const [formData, setFormData] = useState({ username: '', email: '', role: '' });
   const [message, setMessage] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -19,6 +21,7 @@ const Profile = () => {
         setFormData(response.data);
       } catch (error) {
         console.error('Error fetching user data:', error);
+        navigate('/');
       }
     };
     fetchUserData();

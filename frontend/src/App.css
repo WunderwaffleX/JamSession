@@ -1,3 +1,8 @@
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
 body {
   font-family: 'Roboto', sans-serif;
   background-color: #121212;
@@ -5,6 +10,11 @@ body {
   margin: 0;
   padding: 0;
   line-height: 1.6;
+  
+  /* Flexbox для основной структуры */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 header {
@@ -19,6 +29,9 @@ main {
   padding: 40px 20px;
   max-width: 1200px;
   margin: auto;
+  
+  /* Flex-grow для заполнения пространства */
+  flex: 1;
 }
 
 section {
@@ -65,4 +78,7 @@ footer {
   color: #f5f5f5;
   text-align: center;
   padding: 10px;
+  
+  /* Убедитесь, что footer находится внизу */
+  margin-top: auto;
 }

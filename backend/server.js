@@ -17,6 +17,8 @@ const roomRoutes = require('./routes/rooms');
 app.use('/api/users', userRoutes);
 app.use('/api/rooms', roomRoutes);
 
+JWT_SECRET='bipbip'
+
 // Подключение к базе данных MongoDB
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
