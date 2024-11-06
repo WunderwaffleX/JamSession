@@ -49,7 +49,7 @@ const Rooms = () => {
             <li key={room.meetingId} onClick={() => handleRoomClick(room.roomName)}>
               {/* <a href={room.roomUrl} target="_blank" rel="noopener noreferrer"> */}
               <a target="_blank" rel="noopener noreferrer">
-                {room.roomName.substring(1, room.roomName.length - 36)}
+                {room.roomName.substring(1, room.roomName.length)}
               </a>
               <p>Roles: {room.rolesAvailable ? room.rolesAvailable.join(', ') : 'No roles available'}</p>
               <p>End Date: {new Date(room.endDate).toLocaleString()}</p>

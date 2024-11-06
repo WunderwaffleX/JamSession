@@ -10,20 +10,60 @@ const Room = () => {
 
     const handleLeaveRoom = async() => {
       try {
-        await axios.post('http://localhost:5000/api/rooms/addUserRole', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`, // Добавьте токен в заголовок
-            },
-            body: JSON.stringify({ name: roomName}), // Передаем нужные данные
-        });
+        await axios.post(
+          'http://localhost:5000/api/rooms/addUserRole',
+          { roomName },
+          {
+              headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: `Bearer ${token}`,
+              },
+          }
+        );
       } catch (error) {
         console.error('Ошибка при добавлении роли:', error);
     }
     navigate('/rooms'); // Переход на страницу списка комнат
     };
+    
+    useEffect(() => {
+      const addRoleOnUnload = async () => {
+          try {
+              await axios.post(
+                  'http://localhost:5000/api/rooms/addUserRole',
+                  { roomName },
+                  {
+                      headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`,
+                      },
+                  }
+              );
+              console.log("Role added successfully on unload");
+          } catch (error) {
+              console.error("Error adding role on unload:", error);
+          }
+      };
+  
+      const handleBeforeUnload = (event) => {
+          event.preventDefault();
+          addRoleOnUnload();
+      };
+  
+      // Устанавливаем обработчик события для закрытия вкладки
+      window.addEventListener('beforeunload', handleBeforeUnload);
+  
+      return () => {
+          // Удаляем обработчик события при размонтировании компонента
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+      };
+  }, [token, roomName]);
+    
+    
     const [username, setUsername] = useState('');
+    const [Url, setUrl] = useState('');
+
+
     useEffect(() => {
         const fetchUserData = async () => {
           try {
@@ -34,29 +74,33 @@ const Room = () => {
             console.log(response);
             setUsername(response.data.username); // Сохраняем имя пользователя
             console.log(roomName);
-            await axios.post('http://localhost:5000/api/rooms/removeUserRole',
-              { roomName: roomName.substring(0, roomName.length - 36)}, // Передаем нужные данные
+            const responseurl =  await axios.post('http://localhost:5000/api/rooms/removeUserRole',
+              { roomName: roomName}, // Передаем нужные данные
               {
                 method: 'POST',
               headers: {
                   'Content-Type': 'application/json',
                   'Authorization': `Bearer ${token}`, // Добавьте токен в заголовок
               },
-          });
+            });
+            console.log("response:", responseurl);
+            setUrl(responseurl.data.roomUrl);
           } catch (error) {
             console.error('Error fetching user data:', error);
-            navigate('/rooms');
+            // handleLeaveRoom();
           }
         };
     
         fetchUserData();
-      }, []);
+      }, [token, roomName]);
     // Формируем URL для Whereby комнаты
-    const roomUrl = `https://jam-session.whereby.com/${roomName}?displayName=${username}`;
+    const roomUrl = `${Url}?displayName=${username}`;
+    // console.log("url", Url);
+    // console.log("roomurl", roomUrl);
     // console.log(roomUrl)
     return (
         <div className="room-container">
-            <h2>Welcome to the room "{roomName.substring(0, roomName.length - 36)}", {username}!</h2>
+            <h2>Welcome to the room "{roomName}", {username}!</h2>
             <div className="participants-section">Connected Users: [Add logic]</div>
             <div className="video-section">
                 <iframe

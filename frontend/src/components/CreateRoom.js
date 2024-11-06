@@ -37,7 +37,7 @@ const CreateRoom = () => {
             const roomData = await response.json(); // Извлекаем данные комнаты
             console.log("Room Data:", roomData);
             
-            return roomData.videoConferenceUrl; // Вернуть URL комнаты
+            return roomData; // Вернуть URL комнаты
         } catch (error) {
             console.error('Error creating room:', error);
             alert('Failed to create room');
@@ -48,7 +48,7 @@ const CreateRoom = () => {
         e.preventDefault();
         if (roomName && description && roles.length > 0) {
             const roomUrl = await createRoomOnBackend();
-            const nav = '/room/' + roomUrl.split('/').pop();
+            const nav = '/room/' + roomUrl;
             if (roomUrl) {
                 navigate(nav); // Переход к комнате видеоконференции
             }

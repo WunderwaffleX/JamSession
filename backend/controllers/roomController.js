@@ -47,7 +47,7 @@ exports.createRoom = async (req, res) => {
         });
         
         await room.save();
-        res.status(201).json(room);
+        res.status(201).json(room.name);
     } catch (error) {
         console.log(error);
         res.status(400).json({ message: error.message });
@@ -93,8 +93,18 @@ exports.getRooms = async (req, res) => {
         })
         .filter(room => room !== null);
 
-        res.status(200).json(filteredRooms);
-        // console.log("filtered Rooms:", filteredRooms);
+        // res.status(200).json(filteredRooms);
+        const updatedRooms = filteredRooms.map(room => {
+            return {
+                startDate: room.startDate,
+                endDate: room.endDate,
+                roomName: room.roomName.substring(0, room.roomName.length - 36),
+                meetingId: room.meetingId,
+                rolesAvailable: room.rolesAvailable
+            };
+        });
+        
+        console.log("Updated Rooms:", updatedRooms);
 
         const roomsToDelete = roomsFromAPI.filter(room => 
             !dbRooms.some(dbRoom => dbRoom.videoConferenceUrl === room.roomUrl)
@@ -110,7 +120,7 @@ exports.getRooms = async (req, res) => {
             console.log(`Deleted room: ${room.meetingId}`);
         }
 
-        res.status(200).json(filteredRooms);
+        res.status(200).json(updatedRooms);
     } catch (error) {
         // console.error('Error fetching rooms:', error);
         if (!res.headersSent) {
@@ -148,14 +158,19 @@ exports.addUserRole = async (req, res) => {
         const { roomName } = req.body; // Получаем имя комнаты из запроса
         const room = await Room.findOne({ name: roomName });
         const userId = req.user.id; // Получаем ID пользователя из авторизации
+        console.log("roomname: ", roomName);
     
         if (!room) return res.status(404).json({ message: 'Комната не найдена' });
     
         // Ищем пользователя в базе данных по userId
+        console.log("userId: ", userId);
         const user = await User.findById(userId);
+        console.log("user: ", user);
+
         if (!user) return res.status(404).json({ message: 'Пользователь не найден' });
     
-        const role = user.role; // Получаем роль пользователя из записи в базе данных
+        const role = user.role.charAt(0).toUpperCase() + user.role.slice(1);; // Получаем роль пользователя из записи в базе данных
+        console.log("role: ", role);
     
         // Проверяем, есть ли роль в комнате, и добавляем, если её там нет
         if (!room.rolesAvailable.includes(role)) {
@@ -174,6 +189,7 @@ exports.removeUserRole = async (req, res) => {
     console.log('removeuserrole:', req.body);
     try {
         const roomName = req.body.roomName; // Получаем имя комнаты из запроса
+        console.log("roomname: ", roomName);
         const room = await Room.findOne({ name:roomName });
         const userId = req.user.id; // Получаем ID пользователя из авторизации
         // console.log("userID:", userId);
@@ -186,10 +202,14 @@ exports.removeUserRole = async (req, res) => {
         const role = user.role.charAt(0).toUpperCase() + user.role.slice(1); // Получаем роль пользователя из записи в базе данных
         console.log('role', role);   
         // Удаляем роль из списка ролей
+        // if (!room.rolesAvailable.includes(role)) {
+        //     res.status(500).json({ message: 'Ошибка при удалении роли' });
+        //     return;
+        // }
         room.rolesAvailable = room.rolesAvailable.filter(r => r !== role);
         console.log('room', room);   
         await room.save();
-        res.status(200).json({ message: 'Роль успешно удалена' });
+        res.status(200).json({ roomUrl: room.videoConferenceUrl});
     } catch (error) {
         console.log("error", error);
         res.status(500).json({ message: 'Ошибка при удалении роли' });
